@@ -3,7 +3,11 @@
 
 The two methods set and get are based on [Lodash](https://lodash.com/) and ported to Ruby, along with their unit tests.
 
-## Rodash.set example
+## Install
+
+`gem install rodash`
+
+### Rodash.set example
 
 ```ruby
 object = { 'a' => [{ 'b' => { 'c' => 3 } }] }
@@ -17,7 +21,7 @@ object['x'][0]['y']['z']);
  => 5
 ```
 
-## Rodash.get example
+### Rodash.get example
 
 ```ruby
 object = { 'a' => [{ 'b' => { 'c' => 3 } }] };
