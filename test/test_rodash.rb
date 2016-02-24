@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'shoulda'
 
-require_relative 'rodash'
+require_relative '../lib/rodash'
 
 class SetTest < Test::Unit::TestCase
 
@@ -67,7 +67,7 @@ class SetTest < Test::Unit::TestCase
 
 
   should "handle complex paths" do
-    object = { 'a' => { '1.23' => { '["b"]' => { 'c' => { "['d']" => { '\ne\n' => { 'f' => { 'g' => 8 } } } } } } } };
+    object = { 'a' => { '1.23' => { '["b"]' => { 'c' => { "['d']" => { '\ne\n' => { 'f' => { 'g' => 8 } } } } } } } }
 
     paths = [
       'a[-1.23]["[\\"b\\"]"].c[\'[\\\'d\\\']\'][\ne\n][f].g',
@@ -77,7 +77,7 @@ class SetTest < Test::Unit::TestCase
     paths.each do |path|
       Rodash.set(object, path, 10)
       assert_equal object['a']['-1.23']['["b"]']['c']["['d']"]['\ne\n']['f']['g'], 10
-      object['a']['-1.23']['["b"]']['c']["['d']"]['\ne\n']['f']['g'] = 8;
+      object['a']['-1.23']['["b"]']['c']["['d']"]['\ne\n']['f']['g'] = 8
     end
   end
 
@@ -154,7 +154,7 @@ class GetTest < Test::Unit::TestCase
 
 
   should "handle complex paths" do
-    object = { 'a' => { '-1.23' => { '["b"]' => { 'c' => { "['d']" => { '\ne\n' => { 'f' => { 'g' => 8 } } } } } } } };
+    object = { 'a' => { '-1.23' => { '["b"]' => { 'c' => { "['d']" => { '\ne\n' => { 'f' => { 'g' => 8 } } } } } } } }
 
     paths = [
       'a[-1.23]["[\\"b\\"]"].c[\'[\\\'d\\\']\'][\ne\n][f].g',
@@ -188,4 +188,68 @@ class GetTest < Test::Unit::TestCase
     assert_equal Rodash.get(object, ['a', 'b'], nil), nil
   end
 
+end
+
+class UnsetTest < Test::Unit::TestCase
+
+  should "unset property values" do
+    ['a', ['a']].each do |path|
+      object = {'a' => 1, 'c' => 2 }
+      assert Rodash.unset(object, path)
+      assert_equal object, { 'c' => 2}
+    end
+  end
+
+  should "unset deep property values" do
+
+    ['a.b.c', ['a', 'b', 'c']].each do |path|
+      object = {'a' => {'b' => {'c' => nil } } }
+      assert Rodash.unset(object, path)
+      assert_equal object, { 'a' => {'b' => {} } }
+    end
+  end
+
+  should "handle complex paths" do
+
+    paths = [
+      'a[-1.23]["[\\"b\\"]"].c[\'[\\\'d\\\']\'][\ne\n][f].g',
+      ['a', '-1.23', '["b"]', 'c', "['d']", '\ne\n', 'f', 'g']
+    ]
+
+    paths.each do |path|
+      object = { 'a' => { '-1.23' => { '["b"]' => { 'c' => { "['d']" => { '\ne\n' => { 'f' => { 'g' => 8 } } } } } } } }
+      assert Rodash.unset(object, path)
+      assert(!object['a']['-1.23']['["b"]']['c']["['d']"]['\ne\n']['f'].has_key?('g'))
+    end
+  end
+
+  should "return true for nonexistent paths" do
+    object = { 'a' => { 'b' => { 'c' => nil }}}
+
+    ['z', 'a.z', 'a.b.z', 'a.b.c.z'].each do |path|
+      assert Rodash.unset(object, path)
+    end
+
+    assert_equal object, { 'a' => { 'b' => { 'c' => nil }}} 
+  end
+
+  should "not error when object is nullish" do
+    assert Rodash.unset(nil, 'a.b')
+    assert Rodash.unset(nil, ['a','b'])
+  end
+
+  should "not error when object is an array" do
+    object = [1, 2, 3]
+    assert Rodash.unset(object, 'a')
+
+    object = { 'a' => { 'b' => [1,2,3,4] }}
+    assert Rodash.unset(object, 'a.b')
+    assert_equal object, { 'a' => {} }
+  end
+
+  should "replace by nil unset values in arrays" do
+    object = { 'a' => { 'b' => [1,2,3,4] }}
+    assert Rodash.unset(object, 'a.b[2]')
+    assert_equal object, { 'a' => { 'b' => [1,2,nil,4] }}
+  end
 end

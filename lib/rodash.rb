@@ -19,12 +19,12 @@ class Rodash
   #
   # object = { 'a' => [{ 'b' => { 'c' => 3 } }] }
   #
-  # Rodash.set(object, 'a[0].b.c', 4);
-  # object['a'][0]['b']['c'];
+  # Rodash.set(object, 'a[0].b.c', 4)
+  # object['a'][0]['b']['c']
   # // => 4
   #
-  # Rodash.set(object, 'x[0].y.z', 5);
-  # object['x'][0]['y']['z']);
+  # Rodash.set(object, 'x[0].y.z', 5)
+  # object['x'][0]['y']['z'])
   # // => 5
   #
   def self.set(object, path, value)
@@ -40,27 +40,58 @@ class Rodash
   # @returns {*} Returns the resolved value.
   # @example
   #
-  # object = { 'a' => [{ 'b' => { 'c' => 3 } }] };
+  # object = { 'a' => [{ 'b' => { 'c' => 3 } }] }
   #
-  # Rodash.get(object, 'a[0].b.c');
+  # Rodash.get(object, 'a[0].b.c')
   # // => 3
   #
-  # Rodash.get(object, ['a', '0', 'b', 'c']);
+  # Rodash.get(object, ['a', '0', 'b', 'c'])
   # // => 3
   #
-  # Rodash.get(object, 'a.b.c', 'default');
+  # Rodash.get(object, 'a.b.c', 'default')
   # // => 'default'
   def self.get(object, path, defaultValue = nil)
     result = object.nil? ? nil : baseGet(object, path)
     result.nil? ? defaultValue : result
   end
 
+  # Removes the property at `path` of `object`.
+  #
+  # **Note:** This method mutates `object`.
+  #
+  # @param {Hash} object The object to modify.
+  # @param {Array|string} path The path of the property to unset.
+  # @returns {boolean} Returns `true` if the property is deleted, else `false`.
+  # @example
+  #
+  # object = { 'a' => [{ 'b' => { 'c' => 7 } }] }
+  # Rodash.unset(object, 'a[0].b.c')
+  # // => true
+  #
+  # object
+  # // => { 'a' => [{ 'b' => {} }] }
+  #
+  # Rodash.unset(object, 'a[0].b.c')
+  # // => true
+  #
+  # object
+  # // => { 'a' => [{ 'b' => {} }] }
+  #
+  def self.unset(object, path)
+    object.nil? ? true : baseUnset(object, path)
+  end
+
   protected
+
+  @@reIsDeepProp = /\.|\[(?:[^\[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/
+  @@reIsPlainProp = /^\w*$/
+  @@rePropName = /[^.\[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]/
+  @@reEscapeChar = /\\(\\)?/
 
   def self.baseSet(object, path, value, customizer = false)
       throw "object must be a hash" if not object.is_a? Hash
 
-      path = isKey(path, object) ? [path + ''] : baseToPath(path);
+      path = isKey(path, object) ? [path + ''] : baseToPath(path)
 
       nested = object
       newNested = nil
@@ -86,7 +117,7 @@ class Rodash
   end
 
   def self.baseGet(object, path)
-    path = isKey(path, object) ? [path + ''] : baseToPath(path);
+    path = isKey(path, object) ? [path + ''] : baseToPath(path)
 
     index = 0
     length = path.count
@@ -110,10 +141,21 @@ class Rodash
     (index > 0 && index == length) ? object : nil
   end
 
-  @@reIsDeepProp = /\.|\[(?:[^\[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/
-  @@reIsPlainProp = /^\w*$/
-  @@rePropName = /[^.\[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]/
-  @@reEscapeChar = /\\(\\)?/
+  def self.baseUnset(object, path)
+    path = isKey(path, object) ? [path + ''] : baseToPath(path)
+    object = parent(object, path)
+    key = path.last
+    if object.is_a?(Array) && isIndex(key)
+      object[key.to_i] = nil
+    elsif not object.nil?
+      object.delete(key)
+    end
+    return true
+  end
+
+  def self.parent(object, path)
+    path.count == 1 ? object : get(object, path[0 ... -1])
+  end
 
   def self.isKey(value, object)
     return true if value.is_a? Numeric

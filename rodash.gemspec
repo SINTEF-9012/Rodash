@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
   s.name        = 'rodash'
-  s.version     = '1.0.0'
-  s.date        = '2016-02-23'
+  s.version     = '2.0.0'
+  s.date        = '2016-02-24'
   s.summary     = "Rodash"
-  s.description = "_.set and _.get for Ruby"
+  s.description = "_.set, _.get, and _.unset for Ruby"
   s.authors     = ["Antoine Pultier"]
   s.email       = 'antoine.pultier@sintef.no'
   s.files       = ["lib/rodash.rb"]
