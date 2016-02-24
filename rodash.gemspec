@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.summary     = "Rodash"
   s.description = "_.set, _.get, and _.unset for Ruby"
   s.authors     = ["Antoine Pultier"]
-  s.email       = 'antoine.pultier@sintef.no'
+  s.email       = 'antoine.pultier at sintef.no'
   s.files       = ["lib/rodash.rb"]
   s.homepage    = 'https://github.com/SINTEF-9012/Rodash'
   s.license     = 'MIT'
