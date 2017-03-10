@@ -1,6 +1,6 @@
 # Rodash 1.0.0
 # Rodash.get and Rodash.set
-# MIT License 
+# MIT License
 # Based on Lodash.js 4.3.0 <https://lodash.com/>
 
 class Rodash
@@ -30,7 +30,7 @@ class Rodash
   def self.set(object, path, value)
     object.nil? ? object : baseSet(object, path, value)
   end
-     
+
   # Gets the value at `path` of `object`. If the resolved value is
   # `nil` the `defaultValue` is used in its place.
   #
@@ -96,23 +96,26 @@ class Rodash
       nested = object
       newNested = nil
 
-      [*path, nil].each_cons(2) do |key,nextkey|
+      [*path, nil].each_cons(2) do |key, nextkey|
         if isIndex(key) && nested.is_a?(Array)
           key = key.to_i
         end
         if nextkey.nil?
           newNested = nested[key] = value
-        else 
+        else
           newNested = nested[key]
           if isIndex(nextkey) && (!newNested.is_a?(Hash) || !newNested.is_a(Array))
-            nested[key] = newNested = []
+            nested[key] = []
+            newNested = [] if newNested == nil
+            nested[key] = newNested if newNested != nil
           elsif not newNested.is_a? Hash
-            nested[key] = newNested = {}
+            nested[key] = {}
+            newNested = {} if newNested == nil
+            nested[key] = newNested if newNested != nil
           end
         end
         nested = newNested
       end
-
       return object
   end
 
@@ -159,7 +162,6 @@ class Rodash
 
   def self.isKey(value, object)
     return true if value.is_a? Numeric
-
     return !value.is_a?(Array) &&
       (@@reIsPlainProp =~ value || !@@reIsDeepProp =~ value ||
         (!object.nil? && object.has_key?(value)))
