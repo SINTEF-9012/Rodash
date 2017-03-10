@@ -48,6 +48,13 @@ class SetTest < Test::Unit::TestCase
     assert_equal object['a']['b']['c'], 4
   end
 
+  should "add multiple indexes to an array" do
+    object = { "x" => ["a"] }
+    Rodash.set(object, "x[1]", "b")
+    assert_equal object['x'][0], "a"
+    assert_equal object['x'][1], "b"
+  end
+
   should "igone empty brackets" do
     object = {}
     Rodash.set(object, 'a[]', 1)
@@ -57,12 +64,12 @@ class SetTest < Test::Unit::TestCase
   should "handle empty paths" do
     [['', ''], [[], ['']]].each_with_index do |pair,index|
       object = {}
-      Rodash.set(object, pair[0], 1) 
+      Rodash.set(object, pair[0], 1)
       assert_equal object, index > 0 ? {} : {'' => 1}
 
       Rodash.set(object, pair[1], 2)
       assert_equal object, {'' => 2}
-    end 
+    end
   end
 
 
@@ -149,7 +156,7 @@ class GetTest < Test::Unit::TestCase
       object = {}
       assert_equal Rodash.get({}, pair[0]), nil
       assert_equal Rodash.get({'' => 3}, pair[1]), 3
-    end 
+    end
   end
 
 
@@ -230,7 +237,7 @@ class UnsetTest < Test::Unit::TestCase
       assert Rodash.unset(object, path)
     end
 
-    assert_equal object, { 'a' => { 'b' => { 'c' => nil }}} 
+    assert_equal object, { 'a' => { 'b' => { 'c' => nil }}}
   end
 
   should "not error when object is nullish" do
