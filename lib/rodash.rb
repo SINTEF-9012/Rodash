@@ -164,7 +164,7 @@ class Rodash
     return true if value.is_a? Numeric
     return !value.is_a?(Array) &&
       (@@reIsPlainProp =~ value || !@@reIsDeepProp =~ value ||
-        (!object.nil? && object.has_key?(value)))
+        (!object.nil? && !object.is_a?(Array) && object.has_key?(value)))
   end
 
   def self.baseToPath(value)

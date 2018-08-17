@@ -141,6 +141,13 @@ class GetTest < Test::Unit::TestCase
     end
   end
 
+  should "get a key from an array" do
+    object = {'a' => 1}, {'a' => 2}
+
+    assert_equal Rodash.get(object, '[0].a'), 1
+    assert_equal Rodash.get(object, '[1].a'), 2
+  end
+
   should "no coerce array paths to strings" do
     object = {'a,b,c' => 3, 'a' => { 'b' => { 'c' => 4 } } }
     assert_equal Rodash.get(object, ['a', 'b', 'c']), 4
