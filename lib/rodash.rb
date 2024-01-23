@@ -162,8 +162,9 @@ class Rodash
 
   def self.isKey(value, object)
     return true if value.is_a? Numeric
+
     return !value.is_a?(Array) &&
-      (@@reIsPlainProp =~ value || !@@reIsDeepProp =~ value ||
+      (@@reIsPlainProp =~ value || !(@@reIsDeepProp =~ value) ||
         (!object.nil? && !object.is_a?(Array) && object.has_key?(value)))
   end
 
