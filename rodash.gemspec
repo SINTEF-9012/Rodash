@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'rodash'
-  s.version     = '3.0.0'
-  s.date        = '2017-03-10'
+  s.version     = '4.0.0'
+  s.date        = '2024-01-24'
   s.summary     = "Rodash"
   s.description = "_.set, _.get, and _.unset for Ruby"
   s.authors     = ["Antoine Pultier"]
