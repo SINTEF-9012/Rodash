@@ -1,9 +1,9 @@
-require 'test/unit'
+require 'minitest/autorun'
 require 'shoulda'
 
 require_relative '../lib/rodash'
 
-class SetTest < Test::Unit::TestCase
+class SetTest < Minitest::Test
 
   should "set property values" do
     object = {'a' => 1}
@@ -104,8 +104,8 @@ class SetTest < Test::Unit::TestCase
   end
 
   should "not error when object is nullish" do
-    assert_equal Rodash.set(nil, 'a.b', 1), nil
-    assert_equal Rodash.set(nil, ['a','b'], 1), nil
+    assert_nil Rodash.set(nil, 'a.b', 1)
+    assert_nil Rodash.set(nil, ['a','b'], 1)
   end
 
   should "not create an array for missing non-index property names that start with numbers" do
@@ -116,7 +116,7 @@ class SetTest < Test::Unit::TestCase
 
 end
 
-class GetTest < Test::Unit::TestCase
+class GetTest < Minitest::Test
 
   should "get property values" do
     object = {'a' => 1}
@@ -159,9 +159,8 @@ class GetTest < Test::Unit::TestCase
   end
 
   should "handle empty paths" do
-    [['', ''], [[], ['']]].each_with_index do |pair,index|
-      object = {}
-      assert_equal Rodash.get({}, pair[0]), nil
+    [['', ''], [[], ['']]].each do |pair|
+      assert_nil Rodash.get({}, pair[0])
       assert_equal Rodash.get({'' => 3}, pair[1]), 3
     end
   end
@@ -185,26 +184,26 @@ class GetTest < Test::Unit::TestCase
     object = { 'a' => [nil, nil] }
 
     ['a[1].b.c', ['a', '1', 'b', 'c']].each do |path|
-      assert_equal Rodash.get(object, path), nil
+      assert_nil Rodash.get(object, path)
     end
   end
 
   should "be able to return nil values" do
     object = { 'a' => { 'b' => nil }}
-    assert_equal Rodash.get(object, 'a.b'), nil
-    assert_equal Rodash.get(object, ['a', 'b']), nil
+    assert_nil Rodash.get(object, 'a.b')
+    assert_nil Rodash.get(object, ['a', 'b'])
   end
 
   should "return the default value for nil values" do
     object = { 'a' => { 'b' => nil }}
     assert_equal Rodash.get(object, 'a.b', true), true
     assert_equal Rodash.get(object, ['a', 'b'], 898), 898
-    assert_equal Rodash.get(object, ['a', 'b'], nil), nil
+    assert_nil Rodash.get(object, ['a', 'b'], nil)
   end
 
 end
 
-class UnsetTest < Test::Unit::TestCase
+class UnsetTest < Minitest::Test
 
   should "unset property values" do
     ['a', ['a']].each do |path|
